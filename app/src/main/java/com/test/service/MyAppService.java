@@ -121,6 +121,7 @@ public class MyAppService extends Service {
                                 }else{
                                     tvCenter.setText("开始试玩，试玩时间：" + targetTime  + "秒");
                                 }
+
                             }else{
                                 tvLeft.setVisibility(View.VISIBLE);
                                 tvCenter.setVisibility(View.GONE);
@@ -132,10 +133,12 @@ public class MyAppService extends Service {
                                 showCenterView("试玩暂停，试玩" + time + "秒");
                             }
                         }
+
+
                     }
                 });
             }
-        },5*1000,1*1000);
+        },3*1000,1*1000);
     }
 
     @Override
@@ -167,9 +170,12 @@ public class MyAppService extends Service {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        tvCenter.setText("closed");
-                        tvCenter.setVisibility(View.GONE);
                         FloatWindowManager.getInstance().dismissWindow();
+                        MyAppService.this.onDestroy();
+                        endSevice();
+//                        tvLeft.setVisibility(View.GONE);
+//                        tvCenter.setVisibility(View.GONE);
+//                        FloatWindowManager.getInstance().dismissWindow();
 //                        if (removeView){
 ////                            mWindowManager.removeViewImmediate(view);
 ////                            timer.cancel();

@@ -138,6 +138,7 @@ public class MainActivity extends Activity {
 
         if(FloatWindowManager.getInstance().checkPermission(this)){
             Intent intent1 = new Intent(MainActivity.this,MyAppService.class);
+
             bindService(intent1,conn,BIND_AUTO_CREATE);
             //todo 一定要提前判断是否已安装应用
             Intent intent = MainActivity.this.getPackageManager().getLaunchIntentForPackage(ApiUtils.TARGET_PACKGAGE_NAME);
