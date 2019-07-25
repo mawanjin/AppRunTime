@@ -1,4 +1,4 @@
-package com.test.apprun.utils;
+package com.test.apprun.permission.utils;
 
 import android.app.ActivityManager;
 import android.app.usage.UsageStats;
@@ -39,7 +39,7 @@ public class SystemTool {
 //            calendar.add(Calendar.YEAR, -1);
 //            long startTime = calendar.getTimeInMillis();
             List<UsageStats> stats = usage.queryUsageStats(UsageStatsManager.INTERVAL_DAILY,
-                    0, java.lang.System.currentTimeMillis());
+                    0, System.currentTimeMillis());
             if (stats != null && stats.size() > 0)
                 return true;
         } else {

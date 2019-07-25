@@ -19,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.test.apprun.R;
+import com.test.apprun.permission.FloatWindowManager;
 import com.test.apprun.utils.ApiUtils;
 import com.test.apprun.utils.SystemTool;
 
@@ -35,17 +36,12 @@ public class MyAppService extends Service {
     private Handler handler;
 
     private Timer timer;
-    private WindowManager mWindowManager;
-    private View view;
-
-    private RelativeLayout rlContainer;
     private TextView tvLeft;
 
     private TextView tvCenter;
 
     private int time = 0;
-    private int targetTime = 10;
-    private UsageStatsManager usageStatsManager;
+    private int targetTime = 20;
 
     private boolean runInBackground = true;
 
@@ -61,9 +57,7 @@ public class MyAppService extends Service {
         super.onCreate();
         Log.i(TAG,"MyAppService----onCreate");
         handler = new Handler();
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP){
-            usageStatsManager = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
-        }
+
     }
 
     @Override
@@ -78,8 +72,10 @@ public class MyAppService extends Service {
         if (timer != null){
             return;
         }
-
-        showWindow();
+        FloatWindowManager.getInstance().showWindow(this);
+        tvLeft = FloatWindowManager.getInstance().getTvLeft();
+        tvCenter = FloatWindowManager.getInstance().getTvCenter();
+//        showWindow();
         tvLeft.setVisibility(View.GONE);
         tvCenter.setVisibility(View.GONE);
 
@@ -142,43 +138,6 @@ public class MyAppService extends Service {
         },5*1000,1*1000);
     }
 
-    private void showWindow(){
-        if (view != null){
-            return;
-        }
-        view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.layout_window,null);
-        tvLeft = view.findViewById(R.id.tvLeft);
-        tvCenter = view.findViewById(R.id.tvCenter);
-        rlContainer = view.findViewById(R.id.rlContainer);
-        mWindowManager = (WindowManager) getApplication().getSystemService(Context.WINDOW_SERVICE);
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-        //设置type.系统提示型窗口，一般都在应用程序窗口之上.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-        }else{
-            params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-        }
-        //设置效果为背景透明.
-        params.format = PixelFormat.RGBA_8888;
-        //设置flags.不可聚焦及不可使用按钮对悬浮窗进行操控.
-//        params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-
-//        params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-        params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-
-        //设置窗口初始停靠位置.
-        params.gravity = Gravity.LEFT | Gravity.TOP;
-        params.x = 0;
-        params.y = 0;
-
-        params.width = WindowManager.LayoutParams.MATCH_PARENT;
-        params.height = WindowManager.LayoutParams.WRAP_CONTENT;
-
-        tvCenter.setVisibility(View.GONE);
-
-        mWindowManager.addView(view,params);
-    }
-
     @Override
     public void onDestroy() {
 //        Log.i(TAG,"MyAppService----onDestroy");
@@ -187,9 +146,11 @@ public class MyAppService extends Service {
             timer.cancel();
             timer = null;
         }
-        if (mWindowManager != null){
-            mWindowManager.removeViewImmediate(view);
-        }
+
+        FloatWindowManager.getInstance().dismissWindow();
+//        if (mWindowManager != null){
+//            mWindowManager.removeViewImmediate(view);
+//        }
     }
 
     private void showCenterView(String message){
@@ -206,7 +167,9 @@ public class MyAppService extends Service {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
+                        tvCenter.setText("closed");
                         tvCenter.setVisibility(View.GONE);
+                        FloatWindowManager.getInstance().dismissWindow();
 //                        if (removeView){
 ////                            mWindowManager.removeViewImmediate(view);
 ////                            timer.cancel();

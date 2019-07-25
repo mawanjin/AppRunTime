@@ -15,6 +15,7 @@ import android.provider.Settings;
 import android.view.View;
 import android.widget.Toast;
 
+import com.test.apprun.permission.FloatWindowManager;
 import com.test.apprun.utils.ApiUtils;
 import com.test.apprun.utils.SystemTool;
 import com.test.apprun.R;
@@ -74,7 +75,14 @@ public class MainActivity extends Activity {
         if (requestCode == REQUESTCODE_OVER){
 //            startService();
             if (Build.VERSION.SDK_INT >= 23){
-                if (!Settings.canDrawOverlays(MainActivity.this)){
+                if(Build.BRAND.equals("vivo")&&SystemTool.getFloatPermissionStatus(this)!=0){
+                    //已获取悬浮窗
+                    //若没有权限，提示获取.
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
+                    Toast.makeText(MainActivity.this,"需要取得权限以使用悬浮窗",Toast.LENGTH_SHORT).show();
+                    startActivityForResult(intent, REQUESTCODE_OVER);
+                    return;
+                }else if (!Settings.canDrawOverlays(MainActivity.this)){
                     Toast.makeText(MainActivity.this,"未获取到悬浮窗权限",Toast.LENGTH_SHORT).show();
                 }else {
                     startService();
@@ -85,32 +93,60 @@ public class MainActivity extends Activity {
 
     private void startService(){
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            if (!SystemTool.getUsageStatsList(this) && SystemTool.isNoOption(this)){
-                //5.0及以后
-                Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-                Toast.makeText(MainActivity.this,"需要取的查看手机app运行时间的权限",Toast.LENGTH_SHORT).show();
-                startActivityForResult(intent,REQUESTCODE_USAGE);
-                return;
-            }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+//            if (!SystemTool.getUsageStatsList(this) && SystemTool.isNoOption(this)){
+//                //5.0及以后
+//                Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+//                Toast.makeText(MainActivity.this,"需要取的查看手机app运行时间的权限",Toast.LENGTH_SHORT).show();
+//                startActivityForResult(intent,REQUESTCODE_USAGE);
+//                return;
+//            }
+//        }
+//
+//        if(Build.BRAND.equals("vivo")){
+//            int status =  SystemTool.getFloatPermissionStatus(this);
+//            if(status!=0){
+//                //已获取悬浮窗
+//                //若没有权限，提示到i管家中去开启权限
+//                Toast.makeText(MainActivity.this,"请到i管家中开启悬浮窗权限",Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+//        }
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+//            //todo if is vivo
+////            Toast.makeText(MainActivity.this,Build.BRAND+";status:"+status,Toast.LENGTH_SHORT).show();
+//
+//            if (!Settings.canDrawOverlays(MainActivity.this)){
+//                //已获取悬浮窗
+//                //若没有权限，提示获取.
+//                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
+//                Toast.makeText(MainActivity.this,"需要取得权限以使用悬浮窗",Toast.LENGTH_SHORT).show();
+//                startActivityForResult(intent, REQUESTCODE_OVER);
+//                return;
+//            }
+//        }else {
+//
+//            if(Build.BRAND.equals("OPPO")){
+//                Intent intent = new Intent(Intent.ACTION_MAIN);
+//                ComponentName componentName = new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.floatwindow.FloatWindowListActivity");
+//                intent.setComponent(componentName);
+//                startActivity(intent);
+//
+//            }
+//        }
+
+        if(FloatWindowManager.getInstance().checkPermission(this)){
+            Intent intent1 = new Intent(MainActivity.this,MyAppService.class);
+            bindService(intent1,conn,BIND_AUTO_CREATE);
+            //todo 一定要提前判断是否已安装应用
+            Intent intent = MainActivity.this.getPackageManager().getLaunchIntentForPackage(ApiUtils.TARGET_PACKGAGE_NAME);
+            MainActivity.this.startActivity(intent);
+        }else {
+            FloatWindowManager.getInstance().applyPermission(this);
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            if (!Settings.canDrawOverlays(MainActivity.this)){
-                //已获取悬浮窗
-                //若没有权限，提示获取.
-                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
-                Toast.makeText(MainActivity.this,"需要取得权限以使用悬浮窗",Toast.LENGTH_SHORT).show();
-                startActivityForResult(intent, REQUESTCODE_OVER);
-                return;
-            }
-        }
 
-        Intent intent1 = new Intent(MainActivity.this,MyAppService.class);
-        bindService(intent1,conn,BIND_AUTO_CREATE);
-
-        Intent intent = MainActivity.this.getPackageManager().getLaunchIntentForPackage(ApiUtils.TARGET_PACKGAGE_NAME);
-        MainActivity.this.startActivity(intent);
     }
 
     @Override
