@@ -93,15 +93,15 @@ public class MainActivity extends Activity {
 
     private void startService(){
 
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-//            if (!SystemTool.getUsageStatsList(this) && SystemTool.isNoOption(this)){
-//                //5.0及以后
-//                Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-//                Toast.makeText(MainActivity.this,"需要取的查看手机app运行时间的权限",Toast.LENGTH_SHORT).show();
-//                startActivityForResult(intent,REQUESTCODE_USAGE);
-//                return;
-//            }
-//        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if (!SystemTool.getUsageStatsList(this) && SystemTool.isNoOption(this)){
+                //5.0及以后
+                Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                Toast.makeText(MainActivity.this,"需要取的查看手机app运行时间的权限",Toast.LENGTH_SHORT).show();
+                startActivityForResult(intent,REQUESTCODE_USAGE);
+                return;
+            }
+        }
 //
 //        if(Build.BRAND.equals("vivo")){
 //            int status =  SystemTool.getFloatPermissionStatus(this);

@@ -138,7 +138,7 @@ public class MyAppService extends Service {
                     }
                 });
             }
-        },3*1000,1*1000);
+        },2*1000,1*1000);
     }
 
     @Override

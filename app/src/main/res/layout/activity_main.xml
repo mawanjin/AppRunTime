@@ -12,7 +12,7 @@
         android:layout_height="40dp"
         android:layout_marginTop="10dp"
         android:gravity="center"
-        android:text="打开Google浏览器"
+        android:text="打开QQ(确保已安装QQ)"
         android:background="#ff0000"/>
 
     <TextView
@@ -22,6 +22,7 @@
         android:layout_marginTop="10dp"
         android:gravity="center"
         android:text="跳转到IconActivity"
-        android:background="#ff0000"/>
+        android:background="#ff0000"
+        android:visibility="invisible"/>
 
 </LinearLayout>
